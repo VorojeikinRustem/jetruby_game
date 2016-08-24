@@ -11,6 +11,7 @@
 <body>
     <div id="content"></div>
     <script type="text/babel">
+        // Функция перемешивания массива
         function shuffle(array) {
           var currentIndex = array.length, temporaryValue, randomIndex;
           while (0 !== currentIndex) {
@@ -23,6 +24,7 @@
           return array;
         }
 
+        // Функция получения случайного цвета
         function getRandomColor() {
             var letters = '0123456789ABCDEF';
             var color = '#';
@@ -32,16 +34,22 @@
             return color;
         };
 
-        var TILES = [];
-        var colors = [];
+        // Массивы ячеек и цветов
+        var TILES = [], colors = [];
 
+        // Цикл добавление 8 случайных цветов в массив colors
         for (var i=0; i<8; i++) {
             colors.push(getRandomColor());
         };
 
+        // Дублирование элементов массива colors
         colors = colors.concat(colors);
+
+
+        // Перемешивание массива colors
         colors = shuffle(colors);
 
+        // Цикл формирования списка ячеек
         for (var i=0; i<16; i++) {
             TILES.push(
                 {
@@ -52,7 +60,12 @@
             );
         }
 
-
+        
+        /* Информативная компонента отображающая:
+         1. Количества раундов
+         2. Количество открытых ячеек
+         3. Сообщение о пройденной игре.
+        */
         var Info = React.createClass({
             render: function() {
                 var opened_tiles = {
@@ -71,6 +84,7 @@
         });
 
 
+        // Компонента ячейки
         var Tile = React.createClass({
             render: function() {
                 var tile = this.props.tile;
@@ -87,6 +101,7 @@
         });
 
 
+        // Компонента доски с ячейками
         var Board = React.createClass({
             getInitialState: function() {
                 return {
@@ -101,6 +116,7 @@
                 };
             },
 
+            // Обработчик кликов по ячейкам
             handlerClick: function(item, index, color) {
                 var lastTile = this.state.lastTile;
                 var tiles = this.state.tiles;
@@ -118,7 +134,6 @@
                             return tile;
                         }
                     });
-
                     this.setState({tiles: new_tiles});
                     item.opened = true;
                 } else {
@@ -129,7 +144,7 @@
                         }
                     });
                 }
-
+                // Счетчик раундов
                 this.setState({round: this.state.round+1});
             },
 
