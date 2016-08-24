@@ -1,0 +1,50 @@
+@keyframes hide_tile {
+  from {visibility: visible;}
+  to {visibility: hidden;}
+}
+
+
+.board {
+  margin: auto;
+  max-width: 260px;
+}
+
+.tile {
+  border-radius: 2px;
+  width: 50px;
+  height: 50px;
+  margin: 5px;
+  box-sizing: border-box;
+  display: inline-block;
+  list-style: none;
+}
+
+.tile:hover {
+  background-color: #6f6f6f;
+  cursor: pointer;
+}
+
+.opened {
+  visibility: hidden;
+  animation-name: hide_tile;
+  animation-duration: 0.2s;
+}
+
+.closed {
+  background-color: #3C9DD0;
+  display: inline-block;
+}
+
+.show {
+  border-size: 0px !important;
+}
+
+ul {
+  padding: 0px;
+}
+
+.info {
+  text-align: center;
+  margin-top: 20px;
+  font: 400 14px/14px sans-serif;
+}

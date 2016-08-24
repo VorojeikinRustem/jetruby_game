@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JeyRuby game</title>
+    <link rel="stylesheet" href="css/app.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.0/react.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.0/react-dom.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.6.15/browser.js"></script>
+</head>
+<body>
+    <div id="content"></div>
+    <script type="text/babel">
+        function shuffle(array) {
+          var currentIndex = array.length, temporaryValue, randomIndex;
+          while (0 !== currentIndex) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex -= 1;
+            temporaryValue = array[currentIndex];
+            array[currentIndex] = array[randomIndex];
+            array[randomIndex] = temporaryValue;
+          }
+          return array;
+        }
+
+        function getRandomColor() {
+            var letters = '0123456789ABCDEF';
+            var color = '#';
+            for (var i = 0; i < 6; i++ ) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        };
+
+        var TILES = [];
+        var colors = [];
+
+        for (var i=0; i<8; i++) {
+            colors.push(getRandomColor());
+        };
+
+        colors = colors.concat(colors);
+        colors = shuffle(colors);
+
+        for (var i=0; i<16; i++) {
+            TILES.push(
+                {
+                    id: i,
+                    color: colors[i],
+                    opened: false
+                }
+            );
+        }
+
+
+        var Info = React.createClass({
+            render: function() {
+                var opened_tiles = {
+                    display: this.props.opened_tiles == 16 ? 'block' : 'none'
+                };
+                return (
+                    <div className="info">
+                        <p>Открытые ячейки: {this.props.opened_tiles}</p>
+                        <p>Раунд: {this.props.round}</p>
+                        <div style={opened_tiles}>
+                            <h1>Вы прошли игру. Поздравляем!</h1>
+                        </div>
+                    </div> 
+                );
+            }
+        });
+
+
+        var Tile = React.createClass({
+            render: function() {
+                var tile = this.props.tile;
+                var tileStyle = {
+                    backgroundColor: (this.props.lastTile.color == this.props.tile.color && this.props.lastTile.index == tile.id ? tile.color : null)
+                };
+                return (
+                    <div className={'tile ' + (tile.opened ? 'opened' : 'closed') }
+                        style={tileStyle}
+                        onClick={this.props.handlerClick}
+                    ></div> 
+                );
+            }
+        });
+
+
+        var Board = React.createClass({
+            getInitialState: function() {
+                return {
+                    tiles: TILES,
+                    lastTile: 
+                      {
+                        index: null,
+                        color: ''
+                      },
+                    opened_tiles: 0,
+                    round: 1
+                };
+            },
+
+            handlerClick: function(item, index, color) {
+                var lastTile = this.state.lastTile;
+                var tiles = this.state.tiles;
+                if (color == lastTile.color && index != lastTile.index) {
+                    var opened_tiles = this.state.opened_tiles + 2;
+                    this.setState({opened_tiles: opened_tiles});
+                    var new_tiles = this.state.tiles.map(function(tile) {
+                        if (tile.color == color) {
+                            var new_tile = {};
+                            new_tile['id'] = tile.id;
+                            new_tile['color'] = tile.color;
+                            new_tile['opened'] = true;
+                            return new_tile;
+                        } else {
+                            return tile;
+                        }
+                    });
+
+                    this.setState({tiles: new_tiles});
+                    item.opened = true;
+                } else {
+                    this.setState({
+                        lastTile: {
+                            index: index,
+                            color: color
+                        }
+                    });
+                }
+
+                this.setState({round: this.state.round+1});
+            },
+
+            render: function() {
+                return (
+                    <div>
+                        <ul className="board">
+                            {this.state.tiles.map(function(item, index, color) {
+                                var handlerClick = this.handlerClick.bind(this, item, index, item.color);
+                                return (
+                                    <Tile 
+                                        handlerClick={handlerClick}
+                                        lastTile={this.state.lastTile}
+                                        tile={item}
+                                        key={index}
+                                    />
+                                );
+                            }, this)}
+                        </ul>
+                        <Info round={this.state.round} opened_tiles={this.state.opened_tiles}/>
+                    </div>
+                );
+            }
+        });
+
+
+        ReactDOM.render(
+            <Board />,
+            document.getElementById('content')
+        );
+    </script>
+</body>
+</html>
